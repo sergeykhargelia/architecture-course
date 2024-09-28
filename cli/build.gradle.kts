@@ -3,6 +3,10 @@ plugins {
     application
 }
 
+application {
+    mainClass.set("MainKt")
+}
+
 group = "cli"
 version = "1.0-SNAPSHOT"
 
