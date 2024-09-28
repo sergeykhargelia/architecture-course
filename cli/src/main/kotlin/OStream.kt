@@ -16,3 +16,10 @@ fun StringBuilder.asOStream(): OStream = object : OStream {
         this@asOStream.append(s)
     }
 }
+
+class MockOStream : OStream {
+    override fun writeLine(s: String) {
+        TODO("Not yet implemented")
+    }
+
+}

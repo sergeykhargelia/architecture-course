@@ -4,6 +4,13 @@ interface IStream {
     fun readLine(): String?
 }
 
+class MockIStream : IStream {
+    override fun readLine(): String? {
+        TODO("Not yet implemented")
+    }
+
+}
+
 fun File.asIStream(): IStream = object : IStream {
     private val lines = this@asIStream.readLines()
 
