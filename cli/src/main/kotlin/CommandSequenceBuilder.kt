@@ -21,7 +21,7 @@ class CommandSequenceBuilder(private val envWriter: EnvironmentWriter) {
         description: CommandDescription, inputStream: IStream,
         outputStream: OStream, errorStream: OStream
     ): Command {
-        val argumentsToDrop = if (description.type == CommandType.External) 0 else 1
+        val argumentsToDrop = if (description.type == CommandType.External || description.type == CommandType.Assign) 0 else 1
         val args = description.description.drop(argumentsToDrop)
 
         if (description.type == CommandType.Assign) {

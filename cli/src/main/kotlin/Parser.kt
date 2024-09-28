@@ -18,12 +18,10 @@ class Parser(private val envReader: EnvironmentReader) {
                     }
                 }
                 TokenType.Assign -> {
-                    currentCommandType = CommandType.Assign
                     if (currentString != "") {
+                        currentCommandType = CommandType.Assign
                         currentDescription.add(currentString)
                         currentString = ""
-                    } else {
-                        // TODO: handle unexpected format
                     }
                 }
                 // TODO: handle pipe

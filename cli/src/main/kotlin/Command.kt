@@ -130,11 +130,15 @@ class ExternalCommand(
     override val args: List<String>
 ) : Command {
     override fun execute(): ExecutionResult {
-        val returnCode = ProcessBuilder(args)
-            .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-            .redirectError(ProcessBuilder.Redirect.INHERIT)
-            .start()
-            .waitFor()
-        return ExecutionResult(returnCode, false)
+        return try {
+            val returnCode = ProcessBuilder(args)
+                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                .start()
+                .waitFor()
+            ExecutionResult(returnCode, false)
+        } catch (e: Exception) {
+            ExecutionResult(-1, false)
+        }
     }
 }
