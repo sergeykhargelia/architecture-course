@@ -1,5 +1,3 @@
-package cli.src.main.kotlin
-
 enum class CommandType {
     Cat,
     Echo,

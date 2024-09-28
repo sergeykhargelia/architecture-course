@@ -1,5 +1,8 @@
 package cli.src.main.kotlin
 
+import Token
+import TokenType
+
 class Lexer {
     fun tokenize(input: String): List<Token> {
         val tokens = mutableListOf<Token>()

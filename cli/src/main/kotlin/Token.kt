@@ -1,3 +1,3 @@
-package cli.src.main.kotlin
+import TokenType
 
 data class Token(val type: TokenType, val data: String)

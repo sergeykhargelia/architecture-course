@@ -1,5 +1,3 @@
-package cli.src.main.kotlin
-
 class Parser(private val envReader: EnvironmentReader) {
     fun parseCommands(tokens: List<Token>): List<CommandDescription> {
         if (tokens.isEmpty()) {
