@@ -1,3 +1,4 @@
+import java.io.File
 interface Command {
     val args: List<String>
     val inputStream: IStream
@@ -5,7 +6,7 @@ interface Command {
     val errorStream: OStream
     fun execute()
 
-    protected fun extractInputStream() : IStream = when(args.size) {
+    fun extractInputStream() : IStream = when(args.size) {
         1 -> File(args[0]).asIStream()
         0 -> inputStream
         else -> throw IllegalArgumentException("Incorrect number of arguments")
