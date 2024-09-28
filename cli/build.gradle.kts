@@ -7,6 +7,10 @@ application {
     mainClass.set("MainKt")
 }
 
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}
+
 group = "cli"
 version = "1.0-SNAPSHOT"
 
