@@ -5,5 +5,9 @@ interface IStream {
 }
 
 fun File.asIStream(): IStream = object : IStream {
-    override fun readLine(): String? = "dab"
+    private val lines = this@asIStream.readLines()
+
+    private var idx = 0
+
+    override fun readLine(): String? = lines.getOrNull(idx++)
 }
