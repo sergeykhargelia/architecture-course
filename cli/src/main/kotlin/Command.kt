@@ -75,7 +75,7 @@ class EchoCommand(
     override val args: List<String>
 ) : Command {
     override fun execute(): ExecutionResult {
-        args.forEach { outputStream.writeLine(it) }
+        outputStream.writeLine(args.joinToString(" "))
         return ExecutionResult(0, false)
     }
 }
