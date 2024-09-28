@@ -57,8 +57,8 @@ class WCommand(
                 charsNumber += line!!.toCharArray().size
             }
             val stringResult = when (args.size) {
-                0 -> "%6d %6d %6d".format(linesNumber, wordsNumber, charsNumber)
-                else -> "%6d %6d %6d %s".format(linesNumber, wordsNumber, charsNumber, args[0])
+                0 -> "%6d%6d%6d".format(linesNumber, wordsNumber, charsNumber)
+                else -> "%6d%6d%6d %s".format(linesNumber, wordsNumber, charsNumber, args[0])
             }
             outputStream.writeLine(stringResult)
             ExecutionResult(0, false)
