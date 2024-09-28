@@ -1,5 +1,4 @@
 import java.io.File
-import java.io.InputStream
 
 interface IStream {
     fun readLine(): String?

@@ -1,5 +1,3 @@
-import java.io.File
-
 interface OStream {
     fun writeLine(s: String)
 }

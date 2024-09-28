@@ -11,5 +11,4 @@ class Buffer: IStream, OStream {
     override fun writeLine(s: String) {
         lines.add(s)
     }
-
 }

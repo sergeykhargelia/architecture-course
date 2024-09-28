@@ -1,6 +1,3 @@
-import EnvironmentReader
-import EnvironmentWriter
-
 class Environment : EnvironmentReader, EnvironmentWriter {
     private val variables: MutableMap<String, String> = mutableMapOf()
 
