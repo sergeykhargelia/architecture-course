@@ -31,8 +31,8 @@ class CommandSequenceBuilder(private val envWriter: EnvironmentWriter) {
         val commandConstructor = when(description.type) {
             CommandType.Cat -> ::CatCommand
             CommandType.Echo -> ::EchoCommand
-            CommandType.WC -> ::WCommand
-            CommandType.PWD -> ::PwdCommand
+            CommandType.WC -> ::WCCommand
+            CommandType.PWD -> ::PWDCommand
             CommandType.Exit -> ::ExitCommand
             CommandType.External -> ::ExternalCommand
             else -> throw IllegalArgumentException("Unsupported command")

@@ -1,10 +1,8 @@
-import org.junit.jupiter.api.Assertions.*
-
-class PwdCommandTest {
+class PWDCommandTest {
     @org.junit.jupiter.api.Test
     fun `pwd test`() {
         val outputBuffer = StringBuilder()
-        val command = PwdCommand(
+        val command = PWDCommand(
             MockIStream(),
             outputBuffer.asOStream(),
             MockOStream(),

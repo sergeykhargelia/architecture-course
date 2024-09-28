@@ -35,7 +35,7 @@ class CatCommand(
     }
 }
 
-class WCommand(
+class WCCommand(
     override val inputStream: IStream,
     override val outputStream: OStream,
     override val errorStream: OStream,
@@ -75,7 +75,7 @@ class EchoCommand(
     override val args: List<String>
 ) : Command {
     override fun execute(): ExecutionResult {
-        args.forEach { outputStream.writeLine(it) }
+        outputStream.writeLine(args.joinToString(" "))
         return ExecutionResult(0, false)
     }
 }
@@ -91,7 +91,7 @@ class ExitCommand(
     }
 }
 
-class PwdCommand(
+class PWDCommand(
     override val inputStream: IStream,
     override val outputStream: OStream,
     override val errorStream: OStream,
