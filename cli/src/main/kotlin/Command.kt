@@ -35,7 +35,7 @@ class CatCommand(
     }
 }
 
-class WCommand(
+class WCCommand(
     override val inputStream: IStream,
     override val outputStream: OStream,
     override val errorStream: OStream,
@@ -91,7 +91,7 @@ class ExitCommand(
     }
 }
 
-class PwdCommand(
+class PWDCommand(
     override val inputStream: IStream,
     override val outputStream: OStream,
     override val errorStream: OStream,
