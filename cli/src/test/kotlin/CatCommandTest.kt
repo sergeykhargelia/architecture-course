@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 class CatCommandTest {
     @org.junit.jupiter.api.Test
-    fun `test cat with no arguments`() {
+    fun `test cat with no arguments, emulating scenario with pipes`() {
         val outputBuffer = StringBuilder()
         val inputFileText = object {}::class.java.getResource("statement.txt").readText()
         val command = CatCommand(
@@ -19,9 +19,6 @@ class CatCommandTest {
 
     @org.junit.jupiter.api.Test
     fun `test cat with filename as an argument`() {
-        fun joinPaths(prefix: String, suffix: String): String {
-            return Paths.get(prefix, suffix).toString()
-        }
         val outputBuffer = StringBuilder()
         val fileName = "statement.txt"
         val resourcesPath = Paths.get("src", "test", "resources").toString()
