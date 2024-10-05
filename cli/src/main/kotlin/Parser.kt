@@ -3,65 +3,25 @@ class Parser(private val envReader: EnvironmentReader) {
         if (tokens.isEmpty()) {
             return emptyList()
         }
-        val commands = mutableListOf<CommandDescription>()
-        var currentCommandType: CommandType? = null
-        var currentDescription = mutableListOf<String>()
-        var currentString = ""
+        val commandDescriptions = mutableListOf<CommandDescription>()
+        val builder = CommandDescriptionBuilder()
         for (token in tokens) {
             when (token.type) {
-                TokenType.Text -> currentString += token.data
-                TokenType.Variable -> currentString += envReader.getVariable(token.data)
+                TokenType.Text -> builder.appendString(token.data)
+                TokenType.Variable -> builder.appendString(envReader.getVariable(token.data))
                 TokenType.Delimiter -> {
-                    if (currentString != "") {
-                        currentDescription.add(currentString)
-                        currentString = ""
-                    }
+                    builder.flush()
                 }
                 TokenType.Assign -> {
-                    if (currentString != "") {
-                        currentCommandType = CommandType.Assign
-                        currentDescription.add(currentString)
-                        currentString = ""
-                    }
+                    builder.flush()
+                    builder.setAssignCommandType()
                 }
                 TokenType.Pipe -> {
-                    if (currentString != "") {
-                        currentDescription.add(currentString)
-                    }
-                    if (currentCommandType == null && currentDescription.isNotEmpty()) {
-                        currentCommandType = when (currentDescription.first()) {
-                            "cat" -> CommandType.Cat
-                            "echo" -> CommandType.Echo
-                            "wc" -> CommandType.WC
-                            "pwd" -> CommandType.PWD
-                            "exit" -> CommandType.Exit
-                            else -> CommandType.External
-                        }
-                    }
-                    if (currentCommandType != null) {
-                        commands.add(CommandDescription(currentCommandType, currentDescription))
-                    }
-                    currentCommandType = null
-                    currentDescription = mutableListOf()
+                    builder.getCommand()?.let { commandDescriptions.add(it) }
                 }
             }
         }
-        if (currentString != "") {
-            currentDescription.add(currentString)
-        }
-        if (currentCommandType == null && currentDescription.isNotEmpty()) {
-            currentCommandType = when (currentDescription.first()) {
-                "cat" -> CommandType.Cat
-                "echo" -> CommandType.Echo
-                "wc" -> CommandType.WC
-                "pwd" -> CommandType.PWD
-                "exit" -> CommandType.Exit
-                else -> CommandType.External
-            }
-        }
-        if (currentCommandType != null) {
-            commands.add(CommandDescription(currentCommandType, currentDescription))
-        }
-        return commands
+        builder.getCommand()?.let { commandDescriptions.add(it) }
+        return commandDescriptions
     }
 }
