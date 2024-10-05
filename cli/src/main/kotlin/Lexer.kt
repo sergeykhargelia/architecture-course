@@ -21,14 +21,14 @@ class Lexer {
                 data = ""
                 continue
             }
-            if (currentQuote == null && (ch == ' ' || ch == '=' /* || ch == '|' */)) {
+            if (currentQuote == null && (ch == ' ' || ch == '=' || ch == '|')) {
                 if (tokenType != null) {
                     tokens.add(Token(tokenType, data))
                 }
                 when (ch) {
                     ' ' -> tokens.add(Token(TokenType.Delimiter, " "))
                     '=' -> tokens.add(Token(TokenType.Assign, "="))
-                    // TODO: handle pipe
+                    '|' -> tokens.add(Token(TokenType.Pipe, "|"))
                 }
                 tokenType = null
                 data = ""

@@ -13,5 +13,15 @@ class LexerTest {
             Token(TokenType.Delimiter, " "),
             Token(TokenType.Text, "aaa")
         ), lexer.tokenize("echo \"\$x\" '\$x\' aaa"))
+
+        assertEquals(listOf(
+            Token(TokenType.Text, "cat"),
+            Token(TokenType.Delimiter, " "),
+            Token(TokenType.Text, "example.txt"),
+            Token(TokenType.Delimiter, " "),
+            Token(TokenType.Pipe, "|"),
+            Token(TokenType.Delimiter, " "),
+            Token(TokenType.Text, "wc")
+        ), lexer.tokenize("cat example.txt | wc"))
     }
 }

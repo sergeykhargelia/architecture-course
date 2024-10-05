@@ -5,7 +5,7 @@ class Parser(private val envReader: EnvironmentReader) {
         }
         val commands = mutableListOf<CommandDescription>()
         var currentCommandType: CommandType? = null
-        val currentDescription = mutableListOf<String>()
+        var currentDescription = mutableListOf<String>()
         var currentString = ""
         for (token in tokens) {
             when (token.type) {
@@ -24,7 +24,26 @@ class Parser(private val envReader: EnvironmentReader) {
                         currentString = ""
                     }
                 }
-                // TODO: handle pipe
+                TokenType.Pipe -> {
+                    if (currentString != "") {
+                        currentDescription.add(currentString)
+                    }
+                    if (currentCommandType == null && currentDescription.isNotEmpty()) {
+                        currentCommandType = when (currentDescription.first()) {
+                            "cat" -> CommandType.Cat
+                            "echo" -> CommandType.Echo
+                            "wc" -> CommandType.WC
+                            "pwd" -> CommandType.PWD
+                            "exit" -> CommandType.Exit
+                            else -> CommandType.External
+                        }
+                    }
+                    if (currentCommandType != null) {
+                        commands.add(CommandDescription(currentCommandType, currentDescription))
+                    }
+                    currentCommandType = null
+                    currentDescription = mutableListOf()
+                }
             }
         }
         if (currentString != "") {

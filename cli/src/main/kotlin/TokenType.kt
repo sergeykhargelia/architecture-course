@@ -3,5 +3,5 @@ enum class TokenType {
     Text,
     Delimiter,
     Assign,
-    /* Pipe, */
+    Pipe,
 }
