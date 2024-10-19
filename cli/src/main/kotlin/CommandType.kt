@@ -4,6 +4,7 @@ enum class CommandType {
     WC,
     PWD,
     Exit,
+    Grep,
     Assign,
     External,
 }

@@ -19,7 +19,7 @@ class CommandDescriptionBuilder {
         isAssignCommand = true
     }
 
-    fun finishCommandDescription() {
+    private fun finishCommandDescription() {
         flush()
         if (isAssignCommand) {
             commandType = CommandType.Assign
@@ -32,6 +32,7 @@ class CommandDescriptionBuilder {
                 "wc" -> CommandType.WC
                 "pwd" -> CommandType.PWD
                 "exit" -> CommandType.Exit
+                "grep" -> CommandType.Grep
                 else -> CommandType.External
             }
         }

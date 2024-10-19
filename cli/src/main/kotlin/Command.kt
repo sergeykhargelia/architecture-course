@@ -103,6 +103,19 @@ class PWDCommand(
     }
 }
 
+class GrepCommand(
+    override val inputStream: IStream,
+    override val outputStream: OStream,
+    override val errorStream: OStream,
+    override val args: List<String>,
+    val flags: GrepArgs?,
+) : Command {
+    override fun execute(): ExecutionResult {
+        ///TODO
+        return ExecutionResult(0, false)
+    }
+}
+
 class AssignCommand(
     override val inputStream: IStream,
     override val outputStream: OStream,

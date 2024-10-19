@@ -1,3 +1,5 @@
+import com.xenomachina.argparser.ArgParser
+
 class CommandSequenceBuilder(private val envWriter: EnvironmentWriter) {
     fun buildCommands(descriptions: List<CommandDescription>): List<Command> {
         var currentIStream = stdinAsIStream()
@@ -26,6 +28,16 @@ class CommandSequenceBuilder(private val envWriter: EnvironmentWriter) {
 
         if (description.type == CommandType.Assign) {
             return AssignCommand(inputStream, outputStream, errorStream, args, envWriter)
+        }
+
+        if (description.type == CommandType.Grep) {
+            return try {
+                val flags = ArgParser(args.toTypedArray()).parseInto(::GrepArgs)
+                GrepCommand(inputStream, outputStream, errorStream, args, flags)
+            } catch (e: Exception) {
+                println("Cannot parse flags for grep command: ${e.message}")
+                GrepCommand(inputStream, outputStream, errorStream, args, null)
+            }
         }
 
         val commandConstructor = when(description.type) {
