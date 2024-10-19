@@ -1,5 +1,8 @@
 import java.io.File
 import java.nio.file.Paths
+import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 interface Command {
     val args: List<String>
@@ -108,11 +111,71 @@ class GrepCommand(
     override val outputStream: OStream,
     override val errorStream: OStream,
     override val args: List<String>,
-    val flags: GrepArgs?,
+    private val flags: GrepArgs?,
 ) : Command {
     override fun execute(): ExecutionResult {
-        ///TODO
+        if (flags == null) {
+            errorStream.writeLine("Failed to parse flags")
+            return ExecutionResult(-1, false)
+        }
+
+        val file = File(flags.source)
+        if (!file.exists()) {
+            errorStream.writeLine("Input file not found")
+            return ExecutionResult(-1, false)
+        }
+
+        val lines = file.bufferedReader().readLines()
+        val regexOptions = if (flags.caseInsensitive) setOf(RegexOption.IGNORE_CASE) else setOf()
+        val regex = Regex(flags.regex, regexOptions)
+
+        val suitableLinesIds: MutableList<Int> = mutableListOf()
+        lines.forEachIndexed { id, line ->
+            if (lineMatches(line, regex, flags.word)) {
+                suitableLinesIds.add(id)
+            }
+        }
+
+        val segmentsToPrint = mergeIds(suitableLinesIds, flags.after)
+        segmentsToPrint.forEach { (minIndex, maxIndex) ->
+            val rightBorder = min(lines.size - 1, maxIndex + flags.after)
+            for (i in minIndex..rightBorder) {
+                outputStream.writeLine(lines[i])
+            }
+        }
+
         return ExecutionResult(0, false)
+    }
+
+    private fun lineMatches(line: String, regex: Regex, matchByWords: Boolean): Boolean {
+        if (matchByWords) {
+            return line.split(Regex("\\W+")).any { regex.matches(it) }
+        }
+
+        return regex.containsMatchIn(line)
+    }
+
+    private fun mergeIds(ids: List<Int>, minDistance: Int): List<Pair<Int, Int>> {
+        if (ids.isEmpty()) {
+            return listOf()
+        }
+
+        val result: MutableList<Pair<Int, Int>> = mutableListOf()
+        var curLeft = ids.first()
+        var curRight = ids.first()
+
+        for (id in ids) {
+            if (curLeft + minDistance < id) {
+                result.add(Pair(curLeft, curRight))
+                curLeft = id
+                curRight = id
+            } else {
+                curRight = id
+            }
+        }
+
+        result.add(Pair(curLeft, curRight))
+        return result
     }
 }
 
