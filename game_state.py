@@ -7,6 +7,7 @@ from character import Character
 class GameState(IState):
     def __init__(self):
         super().__init__()
+        self.level = 1
         self.character = Character()
         self.target_reached = False
         self.map = Map.generate(10, 10, 0.5)
@@ -16,8 +17,12 @@ class GameState(IState):
         self.update_game_state()
 
     def reset_game_state(self):
+        self.level += 1
         self.target_reached = False
-        self.map = Map.generate(10, 10, 0.5)
+        if self.level % 2 == 0:
+            self.map = Map.load('map_example.txt')
+        else:
+            self.map = Map.generate(10, 10, 0.5)
         character_position = generate_position(self.map.width, self.map.height)
         self.open_hidden_cell(character_position)
         self.character.change_position(character_position)

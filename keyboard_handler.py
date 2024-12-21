@@ -9,5 +9,6 @@ class KeyboardHandler:
 
     def start(self):
         while True:
-            time.sleep(0.3)
-            self.controller.on_keyboard_event(keyboard.read_key())
+            time.sleep(0.5)
+            if not self.controller.on_keyboard_event(keyboard.read_key()):
+                break

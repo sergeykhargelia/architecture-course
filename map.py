@@ -45,3 +45,20 @@ class Map:
                     mp.grid[x][y].is_hidden = True
 
         return mp
+
+    # file format:
+    # width height
+    # map where ' ' - open, '#' - hidden
+    # target position
+    @classmethod
+    def load(cls, filename):
+        with open(filename) as f:
+            width, height = map(int, f.readline().split())
+            mp = cls(width, height)
+            for y in range(height):
+                row = f.readline()
+                for x in range(width):
+                    mp.grid[x][y].is_hidden = row[x] == '#'
+            target_position = list(map(int, f.readline().split()))
+            mp.grid[target_position[0]][target_position[1]].is_target = True
+            return mp
