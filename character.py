@@ -1,8 +1,11 @@
 class Character:
-    def __init__(self, inventory, position, stats):
+    def __init__(self, inventory=None, position: tuple[int, int] = None, stats=None):
         self._inventory = inventory
         self._position = position
         self._stats = stats
+
+    def get_position(self) -> tuple[int, int]:
+        return self._position
 
     def change_position(self, position):
         self._position = position
