@@ -11,13 +11,13 @@ class GameState(IState):
         super().__init__()
         self._level = 1
         self._map = map_state.generate_map(self._level, default_width, default_height, {})
-        self.character = Character(
+        self._character = Character(
             'C', 
             Inventory(), 
             self._place_players()[0], 
             {'health': 5, 'experience': 0, 'attack': 1, 'defense': 0}
         )
-        self.mobs = []
+        self._mobs = []
         self._open_hidden_cells()
 
     def _init_new_level_state(self):
@@ -28,8 +28,8 @@ class GameState(IState):
 
     def _init_new_level_players(self):
         positions = self._place_players()
-        self.character.update_stats('experience', 1)
-        self.character.change_position(positions[0])
+        self._character.update_stats('experience', 1)
+        self._character.change_position(positions[0])
         self._open_hidden_cells()
 
     def _place_players(self):
@@ -46,7 +46,7 @@ class GameState(IState):
         return empty_cells_coordinates[:self._level]        
 
     def _open_hidden_cells(self):
-        character_pos = self.character.get_position()
+        character_pos = self._character.get_position()
         max_dist = 2
 
         for delta_x in range(-max_dist, max_dist + 1):
@@ -69,7 +69,7 @@ class GameState(IState):
             case Direction.RIGHT:
                 delta_x = 1
         
-        old_position = self.character.get_position()
+        old_position = self._character.get_position()
         new_position = (old_position[0] + delta_y, old_position[1] + delta_x)
         if self._map.is_cell_exists(new_position):
             cell_type = self._map.get_cell(new_position).cell_type
@@ -78,10 +78,10 @@ class GameState(IState):
                 return
             elif cell_type != CellType.OBSTACLE:
                 if cell_type == CellType.ITEM:
-                    self.character.add_item(self._map.get_cell(new_position).item)
+                    self._character.add_item(self._map.get_cell(new_position).item)
                     self._map.remove_cell_content(new_position)
 
-                self.character.change_position(new_position)
+                self._character.change_position(new_position)
                 self._open_hidden_cells()
 
     def enable_item(self):
@@ -93,15 +93,15 @@ class GameState(IState):
     # Get compact representation of the game state
     def get_view(self):
         map_view = self._map.get_view()
-        character_position = self.character.get_position()
-        map_view['grid'][character_position[0]][character_position[1]] = self.character.get_view()['name']
+        character_position = self._character.get_position()
+        map_view['grid'][character_position[0]][character_position[1]] = self._character.get_view()['name']
 
-        for mob in self.mobs:
+        for mob in self._mobs:
             pos = mob.get_position()
             map_view['grid'][pos[0]][pos[1]] = mob.get_view()['name']
 
         return {
             'map': map_view,
-            'character': self.character.get_view(),
-            'mobs': list(map(lambda mob: mob.get_view(), self.mobs))
+            'character': self._character.get_view(),
+            'mobs': list(map(lambda mob: mob.get_view(), self._mobs))
         }
