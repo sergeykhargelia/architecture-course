@@ -1,10 +1,10 @@
-from display import Display
+from display import RoguelikeConsoleDisplay
 from game_state import GameState
 from game_controller import GameController
 from keyboard_handler import KeyboardHandler
+from rich.live import Live
 
-
-game_state = GameState()
-controller = GameController(Display(), game_state)
-keyboard_handler = KeyboardHandler(controller)
-keyboard_handler.start()
+with Live(None, auto_refresh=False) as live:
+    game_state = GameState()
+    controller = GameController(RoguelikeConsoleDisplay(live), game_state)
+    KeyboardHandler(controller).start()
