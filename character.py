@@ -44,6 +44,9 @@ class Character(Player):
         super().update_stats('experience', 2)
         self._update_character_level()
     
+    def clone(self):
+        return Character(self._name, self._inventory, self._position, self._stats)
+
     # Get a compact representation of the character 
     def get_view(self):
         view = super().get_view()

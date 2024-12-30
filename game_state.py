@@ -1,13 +1,13 @@
-import random
+import os
 import map_state
 from enum import Enum, auto
 from istate import IState
 from direction import Direction, get_delta_by_direction
-from character import Character
-from mob import Mob, AffectedMob
+from mob import AffectedMob
 from cell import CellType
-from inventory import Inventory
-from mob_strategy import RandomMobStrategy, get_strategy_by_id
+from mob_strategy import RandomMobStrategy, MobStrategyGenerator
+from map_builder import MapGenerator, MapLoader
+from player_generator import SimpleCharacterGenerator, SimpleMobGenerator
 
 class MoveResult(Enum):
     WIN = auto()
@@ -15,56 +15,48 @@ class MoveResult(Enum):
     IN_PROGRESS = auto()
 
 class GameState(IState):
-    def __init__(self, levels_count=5, default_width=10, default_height=10):
+    def __init__(self, levels_count=5, default_height=10, default_width=10, max_visible_dist=2):
         super().__init__()
         self._levels_count = levels_count
         self._level = 1
-        self._map = map_state.generate_map(self._level, default_width, default_height)
-        self._character = Character(
-            'C',
-            Inventory(),
-            self._place_players()[0]
-        )
-        self._mobs = []
+        self._max_visible_dist = max_visible_dist
+        
+        self._map, self._character, self._mobs = MapGenerator(
+            SimpleCharacterGenerator(), None,
+            self._level, default_height, default_width,
+            map_state.generate_position,
+            map_state.generate_cell_type,
+            map_state.generate_item
+        ).build()
+        
         self._open_hidden_cells()
 
     def _init_new_level_state(self):
         self._level += 1
-        width, height = self._map.get_size()
-        self._map = map_state.generate_map(self._level, width, height)
-        self._init_new_level_players()
+        height, width = self._map.get_size()
+        if self._level < self._levels_count:
+            self._map, self._character, self._mobs = MapGenerator(
+                SimpleCharacterGenerator(self._character),
+                SimpleMobGenerator(MobStrategyGenerator()), 
+                self._level, height, width,
+                map_state.generate_position,
+                map_state.generate_cell_type,
+                map_state.generate_item
+            ).build()
+        else:
+            self._map, self._character, self._mobs = MapLoader(
+                SimpleCharacterGenerator(self._character),
+                SimpleMobGenerator(MobStrategyGenerator()),
+                os.path.join('assets', 'final_level_map.txt')       
+            ).build()
 
-    def _init_new_level_players(self):
-        positions = self._place_players()
         self._character.update_stats_after_level_up()
-        self._character.change_position(positions[0])
         self._open_hidden_cells()
-        
-        self._mobs = []
-        for i in range(1, self._level):
-            name = f'mob{i}'
-            strategy = (get_strategy_by_id(i - 1))(self._map)
-            self._mobs.append(Mob(name, strategy, positions[i]))
-
-    def _place_players(self):
-        empty_cells_coordinates = []
-        width, height = self._map.get_size()
-        for x in range(width):
-            for y in range(height):
-                position = (x, y)
-                cell = self._map.get_cell(position)
-                if cell.cell_type == CellType.EMPTY:
-                    empty_cells_coordinates.append(position)
-
-        random.shuffle(empty_cells_coordinates)
-        return empty_cells_coordinates[:self._level]        
 
     def _open_hidden_cells(self):
         character_pos = self._character.get_position()
-        max_dist = 2
-
-        for delta_x in range(-max_dist, max_dist + 1):
-            for delta_y in range(-max_dist, max_dist + 1):
+        for delta_x in range(-self._max_visible_dist, self._max_visible_dist + 1):
+            for delta_y in range(-self._max_visible_dist, self._max_visible_dist + 1):
                 pos = (character_pos[0] + delta_x, character_pos[1] + delta_y)
                 if self._map.is_cell_exists(pos):
                     self._map.open_hidden_cell(pos)
@@ -94,15 +86,17 @@ class GameState(IState):
             
             updated_mobs = []
             for mob in self._mobs:
-                mob.make_move(old_position)
+                mob.make_move(self._map, old_position)
                 if mob.get_position() == new_position:
                     if not self._process_battle(mob):
                         return MoveResult.LOSE
                     
                     if mob.is_alive():
-                        updated_mobs.append(AffectedMob(mob, RandomMobStrategy(self._map)))
+                        updated_mobs.append(AffectedMob(mob, RandomMobStrategy()))
                 else:
                     updated_mobs.append(mob)
+                    if mob.need_replicate():
+                        updated_mobs.append(mob.clone())
 
             self._mobs = updated_mobs
             if cell_type == CellType.TARGET:
