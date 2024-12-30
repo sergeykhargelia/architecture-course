@@ -1,21 +1,29 @@
 import random
 import map_state
+from enum import Enum, auto
 from istate import IState
-from direction import Direction
+from direction import Direction, get_delta_by_direction
 from character import Character
+from mob import Mob, AffectedMob
 from cell import CellType
 from inventory import Inventory
+from mob_strategy import RandomMobStrategy, get_strategy_by_id
+
+class MoveResult(Enum):
+    WIN = auto()
+    LOSE = auto()
+    IN_PROGRESS = auto()
 
 class GameState(IState):
-    def __init__(self, default_width=10, default_height=10):
+    def __init__(self, levels_count=5, default_width=10, default_height=10):
         super().__init__()
+        self._levels_count = levels_count
         self._level = 1
-        self._map = map_state.generate_map(self._level, default_width, default_height, {})
+        self._map = map_state.generate_map(self._level, default_width, default_height)
         self._character = Character(
-            'C', 
-            Inventory(), 
-            self._place_players()[0], 
-            {'health': 5, 'experience': 0, 'attack': 1, 'defense': 0}
+            'C',
+            Inventory(),
+            self._place_players()[0]
         )
         self._mobs = []
         self._open_hidden_cells()
@@ -23,14 +31,20 @@ class GameState(IState):
     def _init_new_level_state(self):
         self._level += 1
         width, height = self._map.get_size()
-        self._map = map_state.generate_map(self._level, width, height, {})
+        self._map = map_state.generate_map(self._level, width, height)
         self._init_new_level_players()
 
     def _init_new_level_players(self):
         positions = self._place_players()
-        self._character.update_stats('experience', 1)
+        self._character.update_stats_after_level_up()
         self._character.change_position(positions[0])
         self._open_hidden_cells()
+        
+        self._mobs = []
+        for i in range(1, self._level):
+            name = f'mob{i}'
+            strategy = (get_strategy_by_id(i - 1))(self._map)
+            self._mobs.append(Mob(name, strategy, positions[i]))
 
     def _place_players(self):
         empty_cells_coordinates = []
@@ -55,50 +69,78 @@ class GameState(IState):
                 if self._map.is_cell_exists(pos):
                     self._map.open_hidden_cell(pos)
 
-    # Make a move and update game state
-    def move_character(self, direction: Direction):
-        delta_x = 0
-        delta_y = 0
-        match direction:
-            case Direction.UP:
-                delta_y = -1
-            case Direction.DOWN:
-                delta_y = 1
-            case Direction.LEFT:
-                delta_x = -1
-            case Direction.RIGHT:
-                delta_x = 1
+    def _process_battle(self, mob):
+        if not self._character.handle_attack(mob):
+            return False
         
+        if not mob.handle_attack(self._character):
+            self._character.update_stats_after_kill()
+
+        return True
+
+    # Make a move and update game state
+    def move_character(self, direction: Direction) -> MoveResult:
+        delta_x, delta_y = get_delta_by_direction(direction)
         old_position = self._character.get_position()
         new_position = (old_position[0] + delta_y, old_position[1] + delta_x)
         if self._map.is_cell_exists(new_position):
             cell_type = self._map.get_cell(new_position).cell_type
-            if cell_type == CellType.TARGET:
-                self._init_new_level_state()
-                return
-            elif cell_type != CellType.OBSTACLE:
-                if cell_type == CellType.ITEM:
-                    self._character.add_item(self._map.get_cell(new_position).item)
-                    self._map.remove_cell_content(new_position)
+            if cell_type == CellType.OBSTACLE:
+                return MoveResult.IN_PROGRESS
+            
+            if cell_type == CellType.ITEM:
+                self._character.add_item(self._map.get_cell(new_position).item)
+                self._map.remove_cell_content(new_position)
+            
+            updated_mobs = []
+            for mob in self._mobs:
+                mob.make_move(old_position)
+                if mob.get_position() == new_position:
+                    if not self._process_battle(mob):
+                        return MoveResult.LOSE
+                    
+                    if mob.is_alive():
+                        updated_mobs.append(AffectedMob(mob, RandomMobStrategy(self._map)))
+                else:
+                    updated_mobs.append(mob)
 
+            self._mobs = updated_mobs
+            if cell_type == CellType.TARGET:
+                if self._level == self._levels_count:
+                    return MoveResult.WIN
+                
+                self._init_new_level_state()
+            else:
                 self._character.change_position(new_position)
                 self._open_hidden_cells()
 
-    def enable_item(self):
-        pass
+        return MoveResult.IN_PROGRESS
 
-    def disable_item(self):
-        pass
+    # Enable character's item
+    def enable_item(self, item):
+        self._character.enable_item(item)
+
+    # Disable character's item
+    def disable_item(self, item):
+        self._character.disable_item(item)
 
     # Get compact representation of the game state
     def get_view(self):
         map_view = self._map.get_view()
-        character_position = self._character.get_position()
-        map_view['grid'][character_position[0]][character_position[1]] = self._character.get_view()['name']
+        def add_player(position, name):
+            if self._map.get_cell(position).is_hidden:
+                return
+            
+            cell = map_view['grid'][position[0]][position[1]]
+            if len(cell) > 0:
+                cell += ','
+            
+            cell += name
+            map_view['grid'][position[0]][position[1]] = cell
 
+        add_player(self._character.get_position(), self._character.get_name())
         for mob in self._mobs:
-            pos = mob.get_position()
-            map_view['grid'][pos[0]][pos[1]] = mob.get_view()['name']
+            add_player(mob.get_position(), mob.get_name())
 
         return {
             'map': map_view,

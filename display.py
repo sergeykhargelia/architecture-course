@@ -1,3 +1,5 @@
+import os
+
 from rich.table import Table
 from rich.text import Text
 from rich.panel import Panel
@@ -9,12 +11,24 @@ class RoguelikeConsoleDisplay:
     def __init__(self, live):
         self._live = live
 
-    # Display current state of the game: map and information about players
-    def display(self, view):
+    # Display the current state of the game: map and information about players
+    def display_game_state(self, view):
         self._live.update(Group(
             RoguelikeConsoleDisplay._render_map(view['map']),
-            RoguelikeConsoleDisplay._render_players(view['character'], view['mobs'])    
+            RoguelikeConsoleDisplay._render_players([view['character']] + view['mobs'])    
         ), refresh=True)
+
+    # Display the lose banner
+    def display_lose(self):
+        with open(os.path.join('assets', 'lose.txt')) as f:
+            text = Text(f.read(), style='bold red')
+            self._live.update(Panel(text, expand=False), refresh=True)
+
+    # Display the win banner
+    def display_win(self):
+        with open(os.path.join('assets', 'win.txt')) as f:
+            text = Text(f.read(), style='bold green')
+            self._live.update(Panel(text, expand=False), refresh=True)
     
     @staticmethod
     def _render_map(map_view):
@@ -30,23 +44,44 @@ class RoguelikeConsoleDisplay:
     
     @staticmethod
     def _render_map_cell(cell):
-        match cell:
-            case '$': return ':trophy:'
-            case '#': return ':construction:'
-            case 'dagger': return ':dagger:'
-            case 'shield': return ':shield:'
-            case 'C': return ':person_walking:'
-            case _: return cell
+        def render_cell_part(part):
+            match part:
+                case '$': return ':trophy:'
+                case '#': return ':construction:'
+                case 'dagger': return ':dagger:'
+                case 'shield': return ':shield:'
+                case 'C': return ':person_walking:'
+                case 'mob1': return ':space_invader:'
+                case 'mob2': return ':ogre:'
+                case 'mob3': return ':robot:'
+                case 'mob4': return ':alien:'
+                case _: return part
+
+        return ' '.join(map(render_cell_part, cell.split(',')))
 
     @staticmethod
-    def _render_players(character_view, mobs_view):
-        s = character_view['stats']
-        table = Table(title=':person_walking:', title_style='', show_header=False, box=box.SIMPLE_HEAD)
-        table.add_column()
-        table.add_column()
-        table.add_row(':heart:', str(s['health']))
-        table.add_row(':kitchen_knife:', str(s['attack']))
-        table.add_row(':helmet_with_white_cross:', str(s['defense']))
-        table.add_row(':crown:', str(s['experience']))
-        
-        return Columns([Panel(table)], expand=False)
+    def _render_stat_component(name):
+        match name:
+            case 'health': return ':heart:'
+            case 'attack': return ':kitchen_knife:'
+            case 'defense': return ':helmet_with_white_cross:'
+            case 'experience': return ':crown:'
+
+    @staticmethod
+    def _render_players(players_view):
+        def generate_table(player_view):
+            s = player_view['stats']
+            table = Table(
+                title=RoguelikeConsoleDisplay._render_map_cell(player_view['name']), 
+                title_style='', show_header=False, box=box.SIMPLE_HEAD
+            )
+            table.add_column()
+            table.add_column()
+            
+            for key in s.keys():
+                table.add_row(RoguelikeConsoleDisplay._render_stat_component(key), str(s[key]))
+
+            return table
+
+        tables = list(map(lambda view: Panel(generate_table(view)), players_view))
+        return Columns(tables, expand=False)
