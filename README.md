@@ -44,11 +44,11 @@
 
 **Роли и случаи использования**
 
-![][./Bookshop Use Cases.png]
+![](./Bookshop%20Use%20Cases.png)
 
 **Композиция**
 
-![][./Bookshop Components.png]
+![](./Bookshop%20Components.png)
 
 **Пользовательский интерфейс**
 
@@ -72,4 +72,4 @@
 
 **Логическая структура**
 
-![][./Bookshop Classes.png]
+![](./Bookshop%20Classes.png)
