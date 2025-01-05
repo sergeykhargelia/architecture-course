@@ -1,6 +1,6 @@
-from display import RoguelikeConsoleDisplay
-from game_state import GameState
-from game_controller import GameController
+from display.display import RoguelikeConsoleDisplay
+from game_state.game_state import GameState
+from controller.game_controller import GameController
 from keyboard_handler import KeyboardHandler
 from rich.live import Live
 

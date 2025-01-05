@@ -1,10 +1,10 @@
 import random
-import map_state
-from istate import IState
-from direction import Direction
-from character import Character
-from cell import CellType
-from inventory import Inventory
+from map_state import map_state
+from game_state.istate import IState
+from util.direction import Direction
+from players.character import Character
+from map_state.cell import CellType
+from players.inventory import Inventory
 
 class GameState(IState):
     def __init__(self, default_width=10, default_height=10):

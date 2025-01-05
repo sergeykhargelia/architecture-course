@@ -1,6 +1,6 @@
-from icontroller import IController
-from istate import IState
-from direction import Direction
+from controller.icontroller import IController
+from game_state.istate import IState
+from util.direction import Direction
 
 class GameController(IController):
     def __init__(self, display, game_state: IState):
