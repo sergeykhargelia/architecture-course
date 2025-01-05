@@ -45,6 +45,6 @@ class TestCharacter(unittest.TestCase):
         character.update_stats('health', -1)
         current_stats['health'] -= 1
         self.assertEqual(get_stats(), current_stats)
-        character.handle_attack(3)
+        character.handle_attack(_get_default_character())
         current_stats['health'] -= 2 # because we have one point of defense
         self.assertEqual(get_stats(), current_stats)
