@@ -1,13 +1,14 @@
 import random
 import map_state
 from enum import Enum, auto
-from istate import IState
-from direction import Direction, get_delta_by_direction
-from character import Character
-from mob import Mob, AffectedMob
-from cell import CellType
-from inventory import Inventory
-from mob_strategy import RandomMobStrategy, get_strategy_by_id
+from game_state.istate import IState
+import map_state.map_state
+from util.direction import Direction, get_delta_by_direction
+from players.character import Character
+from players.mob import Mob, AffectedMob
+from map_state.cell import CellType
+from players.inventory import Inventory
+from players.mob_strategy import RandomMobStrategy, get_strategy_by_id
 
 class MoveResult(Enum):
     WIN = auto()
@@ -19,7 +20,7 @@ class GameState(IState):
         super().__init__()
         self._levels_count = levels_count
         self._level = 1
-        self._map = map_state.generate_map(self._level, default_width, default_height)
+        self._map = map_state.map_state.generate_map(self._level, default_width, default_height)
         self._character = Character(
             'C',
             Inventory(),
@@ -31,7 +32,7 @@ class GameState(IState):
     def _init_new_level_state(self):
         self._level += 1
         width, height = self._map.get_size()
-        self._map = map_state.generate_map(self._level, width, height)
+        self._map = map_state.map_state.generate_map(self._level, width, height)
         self._init_new_level_players()
 
     def _init_new_level_players(self):

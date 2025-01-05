@@ -1,5 +1,5 @@
-from map_state import Map
-from cell import CellType
+from map_state.map_state import Map
+from map_state.cell import CellType
 
 class IMobStrategy():
     def __init__(self, map_state: Map):

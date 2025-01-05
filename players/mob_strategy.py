@@ -1,5 +1,5 @@
 import random
-from imob_strategy import IMobStrategy
+from players.imob_strategy import IMobStrategy
 
 # Make random moves
 class RandomMobStrategy(IMobStrategy):
