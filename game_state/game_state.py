@@ -1,11 +1,11 @@
 import os
 import map_state
 from enum import Enum, auto
-from istate import IState
-from direction import Direction, get_delta_by_direction
-from mob import AffectedMob
-from cell import CellType
-from mob_strategy import RandomMobStrategy, MobStrategyGenerator
+from game_state.istate import IState
+from util.direction import Direction, get_delta_by_direction
+from players.mob import AffectedMob
+from map_state.cell import CellType
+from players.mob_strategy import RandomMobStrategy, MobStrategyGenerator
 from map_builder import MapGenerator, MapLoader
 from player_generator import SimpleCharacterGenerator, SimpleMobGenerator
 

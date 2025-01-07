@@ -16,6 +16,6 @@ class Inventory:
 
     def get_view(self):
         return {
-            'available': self._available_items, 
-            'enabled': self._enabled_items
+            'available': list(map(lambda item: item.get_view(), self._available_items)), 
+            'enabled': list(map(lambda item: item.get_view(), self._enabled_items))
         }

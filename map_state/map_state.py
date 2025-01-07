@@ -1,6 +1,6 @@
 import random
-from cell import Cell, CellType, generate_cell_type
-from item import generate_item
+from map_state.cell import Cell, CellType, generate_cell_type
+from map_state.item import generate_item
 
 class Map:
     def __init__(self, height, width, grid, map_info=None):

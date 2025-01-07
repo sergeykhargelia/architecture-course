@@ -1,6 +1,8 @@
 import random
-from iplayer import Player
-from mob_strategy import RandomMobStrategy
+
+from players.iplayer import Player
+from players.mob_strategy import RandomMobStrategy
+
 
 class Mob(Player):
     def __init__(self, name, strategy, position, stats=None, replication_prob=0.01):

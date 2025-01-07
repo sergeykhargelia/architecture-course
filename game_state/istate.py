@@ -1,4 +1,4 @@
-from direction import Direction
+from util.direction import Direction
 
 class IState:
     def __init__(self):

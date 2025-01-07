@@ -1,5 +1,5 @@
 from sshkeyboard import listen_keyboard
-from icontroller import IController
+from controller.icontroller import IController
 
 class KeyboardHandler:
     def __init__(self, controller: IController):

@@ -1,4 +1,4 @@
-from iplayer import Player
+from players.iplayer import Player
 
 class Character(Player):
     def __init__(self, name, inventory, position, stats=None):
