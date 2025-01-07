@@ -21,6 +21,7 @@ class GameController(IController):
             case 'down': result = self._game_state.move_character(Direction.DOWN)
             case 'left': result = self._game_state.move_character(Direction.LEFT)
             case 'right': result = self._game_state.move_character(Direction.RIGHT)
+            case _: return
 
         match result:
             case MoveResult.WIN: self._display.display_win()

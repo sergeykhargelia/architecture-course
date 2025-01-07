@@ -3,9 +3,9 @@ from map_state.cell import Cell, CellType, generate_cell_type
 from map_state.item import generate_item
 
 class Map:
-    def __init__(self, width, height, grid, map_info=None):
-        self._width = width
+    def __init__(self, height, width, grid, map_info=None):
         self._height = height
+        self._width = width
         self._grid = grid
         self._info = map_info
 
@@ -15,8 +15,8 @@ class Map:
     
     # Check that cell with the given coordinates is inside the map
     def is_cell_exists(self, position):
-        return position[0] >= 0 and position[0] < self._width and \
-               position[1] >= 0 and position[1] < self._height
+        return position[0] >= 0 and position[0] < self._height and \
+               position[1] >= 0 and position[1] < self._width
 
     # Get cell by its coordinates
     def get_cell(self, position):
@@ -36,13 +36,22 @@ class Map:
 
     # Get dimensions of the map
     def get_size(self):
-        return (self._width, self._height)
+        return (self._height, self._width)
 
+    def get_allowed_neighbours(self, position: tuple[int, int]):
+        result = [position]
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            new_position = (position[0] + dx, position[1] + dy)
+            if self.is_cell_exists(new_position) and self.get_cell(new_position).cell_type != CellType.OBSTACLE:
+                result.append(new_position)
+
+        return result
+        
     # Get map representation
     def get_view(self):
         return {
             'info': self._info,
-            'grid': [list(map(lambda cell: cell.get_view(), self._grid[x])) for x in range(self._width)]
+            'grid': [list(map(lambda cell: cell.get_view(), self._grid[x])) for x in range(self._height)]
         }
 
 # Load map from the given file    
@@ -51,18 +60,18 @@ def load_map(filename):
     raise NotImplementedError()
 
 # Generate a random position on the map with given dimensions
-def generate_position(width, height):
-    return random.randint(0, width - 1), random.randint(0, height - 1)
+def generate_position(height, width):
+    return random.randint(0, height - 1), random.randint(0, width - 1)
 
 # Generate random map by level and dimensions
-def generate_map(level, width, height, map_info={}):
+def generate_map(level, height, width, map_info={}):
     map_info['level'] = level
     grid = []
-    target_position = generate_position(width, height)
+    target_position = generate_position(height, width)
     
-    for x in range(width):
+    for x in range(height):
         row = []
-        for y in range(height):
+        for y in range(width):
             if (x, y) == target_position:
                 row.append(Cell(CellType.TARGET, is_hidden=True))
             else:
@@ -74,4 +83,4 @@ def generate_map(level, width, height, map_info={}):
 
         grid.append(row)
 
-    return Map(width, height, grid, map_info)
+    return Map(height, width, grid, map_info)

@@ -38,6 +38,9 @@ class Player:
     def get_name(self):
         return self._name
 
+    def clone(self):
+        return Player(self._name, self._position, self._stats)
+
     # Handle attack by other player
     def handle_attack(self, player) -> bool:
         attack_pts = player.get_stats()['attack']

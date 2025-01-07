@@ -15,3 +15,10 @@ _items = [Item('dagger', 1, 0), Item('shield', 0, 1)]
 # Choose random item from the given _item set
 def generate_item():
     return random.choice(_items)
+
+def get_item_by_name(name):
+    for item in _items:
+        if item.name == name:
+            return item
+        
+    return None
