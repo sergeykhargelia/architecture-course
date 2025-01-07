@@ -1,0 +1,3 @@
+2 3 2
+C mob1 #
+. dagger $
