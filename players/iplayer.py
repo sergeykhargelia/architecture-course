@@ -45,7 +45,7 @@ class Player:
     def handle_attack(self, player) -> bool:
         attack_pts = player.get_stats()['attack']
         damage = max(0, attack_pts - self._stats['defense'])
-        self._stats['health'] -= damage
+        self.update_stats('health', -damage)
         return self._stats['health'] > 0
     
     def get_view(self):
