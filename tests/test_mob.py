@@ -15,15 +15,15 @@ class TestMob(unittest.TestCase):
             (AggressiveMobStrategy, (0, 0))
         ]:
             with self.subTest():
-                mob = Mob('mob', strategy(_get_simple_1d_map()), (0, 1))
-                mob.make_move((0, 0))
+                mob = Mob('mob', strategy(), (0, 1))
+                mob.make_move(_get_simple_1d_map(), (0, 0))
                 self.assertEqual(mob.get_position(), expected_pos)
 
     def test_undeterministic_mob(self):
         possible_positions = set()
         for i in range(20):
-            mob = Mob('mob', RandomMobStrategy(_get_simple_1d_map()), (0, 1))
-            mob.make_move((0, 0))
+            mob = Mob('mob', RandomMobStrategy(), (0, 1))
+            mob.make_move(_get_simple_1d_map(), (0, 0))
             possible_positions.add(mob.get_position())
 
         self.assertEqual(len(possible_positions), 3)

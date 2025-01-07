@@ -1,6 +1,6 @@
-from character import Character
-from inventory import Inventory
-from mob import Mob
+from players.character import Character
+from players.inventory import Inventory
+from players.mob import Mob
 
 class ICharacterGenerator:
     def generate_character(self, position):

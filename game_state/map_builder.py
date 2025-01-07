@@ -1,9 +1,10 @@
 import random
 from typing import List
-from map_state import Map
-from character import Character
-from mob import Mob
-from cell import Cell, CellType
+from map_state.map_state import Map
+from players.character import Character
+from players.mob import Mob
+from map_state.cell import Cell, CellType
+from map_state.item import get_item_by_name
 
 class IMapBuilder:
     def __init__(self, character_generator, mob_generator):
@@ -62,8 +63,12 @@ class MapLoader(IMapBuilder):
                     match str:
                         case '#': cell = Cell(CellType.OBSTACLE, is_hidden=True)
                         case '$': cell = Cell(CellType.TARGET, is_hidden=True)
-                        case _: cell = Cell(CellType.EMPTY, is_hidden=True)
-
+                        case x: 
+                            item = get_item_by_name(x)
+                            if item:
+                                cell = Cell(CellType.ITEM, item=get_item_by_name(x), is_hidden=True)
+                            else:
+                                cell = Cell(CellType.EMPTY, is_hidden=True)
                     row.append(cell)
 
                 grid.append(row)
