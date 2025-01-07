@@ -55,7 +55,7 @@ def generate_position(width, height):
     return random.randint(0, width - 1), random.randint(0, height - 1)
 
 # Generate random map by level and dimensions
-def generate_map(level, width, height, map_info):
+def generate_map(level, width, height, map_info={}):
     map_info['level'] = level
     grid = []
     target_position = generate_position(width, height)
