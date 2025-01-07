@@ -3,7 +3,6 @@ from enum import Enum, auto
 from game_state.istate import IState
 from map_state import map_state
 from util.direction import Direction, get_delta_by_direction
-from players.mob import AffectedMob
 from map_state.cell import CellType
 from players.mob_strategy import RandomMobStrategy, MobStrategyGenerator
 from game_state.map_builder import MapGenerator, MapLoader
@@ -92,7 +91,7 @@ class GameState(IState):
                         return MoveResult.LOSE
                     
                     if mob.is_alive():
-                        updated_mobs.append(AffectedMob(mob, RandomMobStrategy()))
+                        updated_mobs.append(mob)
                 else:
                     updated_mobs.append(mob)
                     if mob.need_replicate():
